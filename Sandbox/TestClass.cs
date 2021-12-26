@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,9 +9,9 @@ namespace Sandbox
     {
         private ConcurrentDictionary<int, int> dictionary = new ConcurrentDictionary<int, int>();
 
-        private int normalInt = 0;
+        private int normalInt;
 
-        private bool done = false;
+        private bool done;
 
         public void Start()
         {

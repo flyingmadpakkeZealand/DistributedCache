@@ -21,7 +21,9 @@ namespace DistributedSetupLib.Master
         private uint _syncCounter; //Note: Only interlocked access!
         private volatile ImmutableList<IPEndPoint> _endPoints; //Note: How does volatile actually work when the getter method is a new method frame each time?
 
-        public ImmutableList<IPEndPoint> GetEndPoints => _endPoints;
+        public int Sections { get; }
+
+        public ImmutableList<IPEndPoint> EndPoints => _endPoints;
 
         public MasterNode(int port, IRequestHandler masterRequestHandler, IEnumerable<IPEndPoint> slaveEndPoints) :
             base(port)
@@ -37,6 +39,7 @@ namespace DistributedSetupLib.Master
                 _endPoints = ImmutableList.Create(slaveEndPoints.ToArray());
             }
 
+            Sections = 0b1_0000_0000_0000_0000;
             _syncCounter = uint.MaxValue;
         }
 

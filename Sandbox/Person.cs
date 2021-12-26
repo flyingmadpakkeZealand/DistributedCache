@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Sandbox
+﻿namespace Sandbox
 {
     public class Person
     {
@@ -17,5 +11,14 @@ namespace Sandbox
         public float Weight { get; set; }
 
         public long Atoms { get; set; }
+
+        public Person()
+        {
+        }
+
+        public Person(string name)
+        {
+            Name = name;
+        }
     }
 }

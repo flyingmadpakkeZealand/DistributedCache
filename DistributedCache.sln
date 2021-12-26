@@ -17,7 +17,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestSlave", "TestSlave\Test
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestMaster", "TestMaster\TestMaster.csproj", "{32F0C6B4-7EB7-4756-BE11-51BFD1B4DCCA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestSlave2", "TestSlave2\TestSlave2.csproj", "{DACC42E5-5EF3-4C8B-9C39-3E760699381D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestSlave2", "TestSlave2\TestSlave2.csproj", "{DACC42E5-5EF3-4C8B-9C39-3E760699381D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheTesting", "CacheTesting\CacheTesting.csproj", "{E2E9B73F-D291-4B78-9F0F-9188A475FB03}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,6 +59,10 @@ Global
 		{DACC42E5-5EF3-4C8B-9C39-3E760699381D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DACC42E5-5EF3-4C8B-9C39-3E760699381D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DACC42E5-5EF3-4C8B-9C39-3E760699381D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E2E9B73F-D291-4B78-9F0F-9188A475FB03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2E9B73F-D291-4B78-9F0F-9188A475FB03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2E9B73F-D291-4B78-9F0F-9188A475FB03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2E9B73F-D291-4B78-9F0F-9188A475FB03}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

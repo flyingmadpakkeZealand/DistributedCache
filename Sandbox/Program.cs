@@ -1,20 +1,27 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
-using CacheLib;
+using CacheLib.Discard;
 using DistributedSetupLib.Connection;
 using Newtonsoft.Json;
+using Sandbox.DiscardPolicyTest;
 
 namespace Sandbox
 {
     class Program
     {
+        public abstract class MyClass
+        {
+            
+        }
+
+        public class MyClass2 : MyClass
+        {
+            
+        }
+
         public enum MyEnum
         {
             Ok = 200
@@ -24,6 +31,16 @@ namespace Sandbox
 
         static void Main(string[] args)
         {
+            RecursiveLinkedListWorker worker = new RecursiveLinkedListWorker();
+            var result1 = worker.Lru();
+            var result2 = worker.Lfu();
+            var result3 = worker.LfRu();
+
+            Func<string, Person> personCreator = str => new Person(str);
+
+            DiscardGraph<MyClass> graph = new DiscardGraph<MyClass>();
+            graph.AddNew(new MyClass2());
+
             //TestClass t = new TestClass();
             //t.Start4();
 
@@ -52,6 +69,21 @@ namespace Sandbox
             //    tasks[i + 1] = Task.Run(() => twoNumbers[1]);
             //}
 
+            //DataObject do1 = new DataObject();
+            //DataObject do2 = new DataObject();
+            //RecursiveLinkedList recursiveLinkedList = new RecursiveLinkedList(new HitCountPolicy(), new MockPolicy());
+            //var result = recursiveLinkedList.AddNew(do1);
+            //var result2 = recursiveLinkedList.AddNew(do2);
+            
+            //do1.OnSomeCommandInvoked(15);
+            //recursiveLinkedList.UpdateNode(ref result);
+            //recursiveLinkedList.UpdateNode(ref result2);
+
+            //var result3 = recursiveLinkedList.RemoveEntries(2);
+
+            //DataObject do3 = new DataObject();
+            //recursiveLinkedList.AddNew(do3);
+            
 
             //Task.WaitAll(tasks);
 

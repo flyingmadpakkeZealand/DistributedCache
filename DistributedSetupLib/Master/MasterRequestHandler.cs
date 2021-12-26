@@ -41,10 +41,10 @@ namespace DistributedSetupLib.Master
         {
             string fetch = args[0], key = args[1];
 
-            ImmutableList<IPEndPoint> slaveEndPoints = context.GetEndPoints;
-            int index = (int) context.GetSyncCount() % slaveEndPoints.Count;
+            //ImmutableList<IPEndPoint> slaveEndPoints = context.GetEndPoints;
+            //int index = (int) context.GetSyncCount() % slaveEndPoints.Count;
 
-            IPEndPoint slaveEndpoint = slaveEndPoints[index];
+            IPEndPoint slaveEndpoint = GetSlaveEndPoint(context, key);
 
             return ConnectWithNewClientAndGetResponse(slaveEndpoint, $"{fetch} {key}");
         }
@@ -53,54 +53,65 @@ namespace DistributedSetupLib.Master
         {
             string set = args[0], key = args[1], value = args[2];
 
-            bool failed = false;
-            StringBuilder bodyBuilder = new StringBuilder();
+            //bool failed = false;
+            //StringBuilder bodyBuilder = new StringBuilder();
             string request = $"{set} {key} {value}";
-            foreach (IPEndPoint slaveEndpoint in context.GetEndPoints)
-            {
-                MaSlResponse response = ConnectWithNewClientAndGetResponse(slaveEndpoint, request);
+            //foreach (IPEndPoint slaveEndpoint in context.GetEndPoints)
+            //{
+            //    MaSlResponse response = ConnectWithNewClientAndGetResponse(slaveEndpoint, request);
 
-                bodyBuilder.AppendLine($"{slaveEndpoint.Address} : {response.StatusCode.ToNumber()}");
-                if (response.StatusCode == StatusCode.NotFound) failed = true;
-            }
+            //    bodyBuilder.AppendLine($"{slaveEndpoint.Address} : {response.StatusCode.ToNumber()}");
+            //    if (response.StatusCode == StatusCode.NotFound) failed = true;
+            //}
 
-            return CombineMultiResponse(failed, bodyBuilder);
+            //return CombineMultiResponse(failed, bodyBuilder);
+            IPEndPoint slaveEndPoint = GetSlaveEndPoint(context, key);
+
+            return ConnectWithNewClientAndGetResponse(slaveEndPoint, request);
         }
 
         private MaSlResponse Delete(MasterNode context, string[] args)
         {
             string delete = args[0], key = args[1];
 
-            bool failed = false;
-            StringBuilder bodyBuilder = new StringBuilder();
+            //bool failed = false;
+            //StringBuilder bodyBuilder = new StringBuilder();
             string request = $"{delete} {key}";
-            foreach (IPEndPoint slaveEndPoint in context.GetEndPoints)
-            {
-                MaSlResponse response = ConnectWithNewClientAndGetResponse(slaveEndPoint, request);
+            //foreach (IPEndPoint slaveEndPoint in context.GetEndPoints)
+            //{
+            //    MaSlResponse response = ConnectWithNewClientAndGetResponse(slaveEndPoint, request);
 
-                bodyBuilder.AppendLine($"{slaveEndPoint.Address} : {response.StatusCode.ToNumber()}");
-                if (response.StatusCode == StatusCode.NotFound) failed = true;
-            }
+            //    bodyBuilder.AppendLine($"{slaveEndPoint.Address} : {response.StatusCode.ToNumber()}");
+            //    if (response.StatusCode == StatusCode.NotFound) failed = true;
+            //}
 
-            return CombineMultiResponse(failed, bodyBuilder);
+            //return CombineMultiResponse(failed, bodyBuilder);
+
+            IPEndPoint slaveEndPoint = GetSlaveEndPoint(context, key);
+
+            return ConnectWithNewClientAndGetResponse(slaveEndPoint, request);
         }
 
         private MaSlResponse CompareAndSwap(MasterNode context, string[] args)
         {
             string cas = args[0], key = args[1], expectedValue = args[2], newValue = args[3];
 
-            bool failed = false;
-            StringBuilder bodyBuilder = new StringBuilder();
+            //bool failed = false;
+            //StringBuilder bodyBuilder = new StringBuilder();
             string request = $"{cas} {key} {expectedValue} {newValue}";
-            foreach (IPEndPoint slaveEndPoint in context.GetEndPoints)
-            {
-                MaSlResponse response = ConnectWithNewClientAndGetResponse(slaveEndPoint, request);
+            //foreach (IPEndPoint slaveEndPoint in context.GetEndPoints)
+            //{
+            //    MaSlResponse response = ConnectWithNewClientAndGetResponse(slaveEndPoint, request);
 
-                bodyBuilder.AppendLine($"{slaveEndPoint.Address} : {response.StatusCode.ToNumber()}");
-                if (response.StatusCode == StatusCode.NotFound) failed = true;
-            }
+            //    bodyBuilder.AppendLine($"{slaveEndPoint.Address} : {response.StatusCode.ToNumber()}");
+            //    if (response.StatusCode == StatusCode.NotFound) failed = true;
+            //}
 
-            return CombineMultiResponse(failed, bodyBuilder);
+            //return CombineMultiResponse(failed, bodyBuilder);a
+
+            IPEndPoint slaveEndPoint = GetSlaveEndPoint(context, key);
+
+            return ConnectWithNewClientAndGetResponse(slaveEndPoint, request);
         }
 
         private MaSlResponse CombineMultiResponse(bool failed, StringBuilder bodyBuilder)
@@ -155,6 +166,19 @@ namespace DistributedSetupLib.Master
             using StreamReader sr = new StreamReader(client.GetStream());
 
             return WriteRequestAndGetResponse(request, sw, sr);
+        }
+
+        private int GetSection(string key, MasterNode context)
+        {
+            int hash = key.GetHashCode() % context.Sections;
+            return Math.Abs(hash); //Note: hash must not be negative.
+        }
+
+        private IPEndPoint GetSlaveEndPoint(MasterNode context, string key)
+        {
+            ImmutableList<IPEndPoint> endPoints = context.EndPoints;
+
+            return endPoints[GetSection(key, context) % endPoints.Count]; //Double modulus: Mostly just simulates a future implementation.
         }
     }
 }
