@@ -9,7 +9,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace CacheLibTests
 {
     [TestClass]
-    public class DiscardGraphTest
+    public class DiscardGraphTests
     {
         private const string A = "A";
         private const string B = "B";

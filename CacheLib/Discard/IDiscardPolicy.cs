@@ -10,14 +10,14 @@ namespace CacheLib.Discard
     {
         int LookAhead { get; }
 
-        int Insertion(TValue listValue);
+        int Insertion(TValue value);
 
         int Deletion();
 
-        object ClusterData(TValue listValue);
+        object ClusterData(TValue value);
 
-        int Change(object clusterData, TValue listValue);
+        int Change(object clusterData, TValue value);
 
-        bool Allowance(object clusterData, TValue listValue);
+        bool Allowance(object clusterData, TValue value);
     }
 }

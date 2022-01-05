@@ -26,7 +26,7 @@ namespace CacheTesting.DiscardStrategies
             return null;
         }
 
-        public int Change(object clusterData, BasicAccessData listValue)
+        public virtual int Change(object clusterData, BasicAccessData listValue)
         {
             return 1;
         }

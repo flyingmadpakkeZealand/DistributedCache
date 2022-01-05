@@ -25,14 +25,14 @@ namespace CacheLib.Discard
             _rootDimension = RecursiveLinkedList<object>.CreateInitial<object>();
         }
 
-        public LinkedListNode<object> AddNew([NotNull] TValue listValue)
+        public LinkedListNode<object> AddNew([NotNull] TValue clusterValue)
         {
-            return TraverseDownAndAdd(_rootDimension, 1, listValue);
+            return TraverseDownAndAdd(_rootDimension, 1, clusterValue);
         }
 
         public void UpdateNode(ref LinkedListNode<object> bottomNode)
         {
-            TValue listValue = (TValue)bottomNode.Value;
+            TValue clusterValue = (TValue)bottomNode.Value;
 
             Stack<LinkedListNode<object>> clusterNodeStack = GetClusterNodeStack(bottomNode, 1);
 
@@ -45,7 +45,7 @@ namespace CacheLib.Discard
                 LinkedListNode<object> down = clusterNodeStack.Pop();
                 RecursiveLinkedList<object> currentCluster = (RecursiveLinkedList<object>)down.Value;
 
-                targetDimensionLevel = policy.Change(currentCluster.ClusterData, listValue);
+                targetDimensionLevel = policy.Change(currentCluster.ClusterData, clusterValue);
                 if (targetDimensionLevel > 0)
                 {
                     bottomNode = TraverseUpAndUpdate(down, dimensionLevel, targetDimensionLevel, bottomNode);
@@ -56,7 +56,7 @@ namespace CacheLib.Discard
             }
 
             policy = _policies[_totalDimensions - 1];
-            targetDimensionLevel = policy.Change(null, listValue);
+            targetDimensionLevel = policy.Change(null, clusterValue);
             if (targetDimensionLevel > 0)
             {
                 bottomNode = TraverseUpAndUpdate(bottomNode, dimensionLevel, targetDimensionLevel, bottomNode);
@@ -68,11 +68,10 @@ namespace CacheLib.Discard
             RecursiveLinkedList<object> currentCluster = (RecursiveLinkedList<object>)bottomNode.List;
 
             Stack<LinkedListNode<object>> clusterNodeStack = new Stack<LinkedListNode<object>>(_totalDimensions);
-            LinkedListNode<object> up;
 
             for (int i = _totalDimensions; i > targetDimension; i--)
             {
-                up = currentCluster!.ClusterNode;
+                LinkedListNode<object> up = currentCluster!.ClusterNode;
                 currentCluster = (RecursiveLinkedList<object>)up.List;
                 clusterNodeStack.Push(up);
             }
@@ -83,7 +82,7 @@ namespace CacheLib.Discard
         public ICollection<LinkedListNode<object>> RemoveEntries(int amount = 1)
         {
             ICollection<LinkedListNode<object>> removedNodes = new List<LinkedListNode<object>>();
-            GoDown(_rootDimension, removedNodes, amount, 1);
+            GoDownAndRemove(_rootDimension, removedNodes, amount, 1);
 
             return removedNodes;
         }
@@ -94,13 +93,13 @@ namespace CacheLib.Discard
 
             while (currentNode is not null)
             {
-                GoDown((RecursiveLinkedList<object>)currentNode.Value, removedNodes, amount, currentDimensionLevel + 1);
+                GoDownAndRemove((RecursiveLinkedList<object>)currentNode.Value, removedNodes, amount, currentDimensionLevel + 1);
                 if (removedNodes.Count == amount) return;
                 currentNode = direction == 0 ? currentNode.Next : currentNode.Previous;
             }
         }
 
-        private void GoDown(RecursiveLinkedList<object> currentCluster, ICollection<LinkedListNode<object>> removedNodes, int amount, int currentDimensionLevel)
+        private void GoDownAndRemove(RecursiveLinkedList<object> currentCluster, ICollection<LinkedListNode<object>> removedNodes, int amount, int currentDimensionLevel)
         {
             IDiscardPolicy<TValue> currentPolicy = _policies[currentDimensionLevel - 1];
             int direction = currentPolicy.Deletion();
@@ -131,11 +130,11 @@ namespace CacheLib.Discard
             RecursiveLinkedList<object> currentCluster = (RecursiveLinkedList<object>)start.List;
             RecursiveLinkedList<object> bottomCluster = (RecursiveLinkedList<object>)bottomNode.List;
             bottomCluster!.Remove(bottomNode);
-            TValue listValue = (TValue)bottomNode.Value;
+            TValue clusterValue = (TValue)bottomNode.Value;
 
             if (targetDimensionLevel == _totalDimensions)
             {
-                return TraverseDownAndAdd(currentCluster, targetDimensionLevel, listValue);
+                return TraverseDownAndAdd(currentCluster, targetDimensionLevel, clusterValue);
             }
 
             LinkedListNode<object> up = start;
@@ -146,13 +145,13 @@ namespace CacheLib.Discard
             }
 
             IDiscardPolicy<TValue> policy = _policies[targetDimensionLevel - 1];
-            return TraverseRightThenDownAndAdd(up, targetDimensionLevel, listValue, policy.LookAhead); //TODO: Traverse left.
+            return TraverseRightThenDownAndAdd(up, targetDimensionLevel, clusterValue, policy.LookAhead); //TODO: Traverse left.
         }
 
         private LinkedListNode<object> TraverseRightThenDownAndAdd(LinkedListNode<object> start, int currentDimensionLevel,
-            TValue listValue, int lookAhead = 1) //TODO: Must return the created bottom node from TraverseDownAndAdd. 
+            TValue clusterValue, int lookAhead = 1) //TODO: Must return the created bottom node from TraverseDownAndAdd. 
         {
-            if (currentDimensionLevel == _totalDimensions)
+            if (currentDimensionLevel >= _totalDimensions)
             {
                 throw new ArgumentOutOfRangeException(nameof(currentDimensionLevel));
             }
@@ -177,23 +176,23 @@ namespace CacheLib.Discard
                 if (next is null)
                 {
                     RecursiveLinkedList<object> newLastCluster =
-                        RecursiveLinkedList<object>.CreateLast<object>(currentNode.List, policy.ClusterData(listValue));
+                        RecursiveLinkedList<object>.CreateLast<object>(currentNode.List, policy.ClusterData(clusterValue));
 
-                    return TraverseDownAndAdd(newLastCluster, currentDimensionLevel + 1, listValue);
+                    return TraverseDownAndAdd(newLastCluster, currentDimensionLevel + 1, clusterValue);
                 }
 
-                RecursiveLinkedList<object> awareLinkedList = (RecursiveLinkedList<object>)next.Value;
-                if (i == lookAhead - 1 || policy.Change(awareLinkedList.ClusterData, listValue) < 1)
+                RecursiveLinkedList<object> nextCluster = (RecursiveLinkedList<object>)next.Value;
+                if (i == lookAhead - 1 || policy.Change(nextCluster.ClusterData, clusterValue) < 1)
                 {
-                    if (policy.Allowance(awareLinkedList.ClusterData, listValue))
+                    if (policy.Allowance(nextCluster.ClusterData, clusterValue))
                     {
-                        return TraverseDownAndAdd(awareLinkedList, currentDimensionLevel + 1, listValue);
+                        return TraverseDownAndAdd(nextCluster, currentDimensionLevel + 1, clusterValue);
                     }
 
-                    RecursiveLinkedList<object> newlyCreated = RecursiveLinkedList<object>.CreateAfter<object>(currentNode.List, policy.ClusterData(listValue),
+                    RecursiveLinkedList<object> newlyCreatedCluster = RecursiveLinkedList<object>.CreateAfter<object>(currentNode.List, policy.ClusterData(clusterValue),
                         currentNode);
 
-                    return TraverseDownAndAdd(newlyCreated, currentDimensionLevel + 1, listValue);
+                    return TraverseDownAndAdd(newlyCreatedCluster, currentDimensionLevel + 1, clusterValue);
                 }
 
                 currentNode = next;
@@ -203,11 +202,11 @@ namespace CacheLib.Discard
             throw new ArgumentOutOfRangeException(nameof(lookAhead));
         }
 
-        private LinkedListNode<object> TraverseDownAndAdd(RecursiveLinkedList<object> start, int currentDimensionLevel, TValue listValue)
+        private LinkedListNode<object> TraverseDownAndAdd(RecursiveLinkedList<object> start, int currentDimensionLevel, TValue clusterValue)
         {
             RecursiveLinkedList<object> currentCluster = start;
             IDiscardPolicy<TValue> currentPolicy = _policies[currentDimensionLevel - 1];
-            int position = currentPolicy.Insertion(listValue);
+            int position = currentPolicy.Insertion(clusterValue);
 
             for (int i = currentDimensionLevel; i < _totalDimensions; i++)
             {
@@ -218,19 +217,19 @@ namespace CacheLib.Discard
                     if (first is null)
                     {
                         nextCluster = RecursiveLinkedList<object>.CreateFirst<object>(currentCluster,
-                            currentPolicy.ClusterData(listValue));
+                            currentPolicy.ClusterData(clusterValue));
                     }
                     else
                     {
-                        RecursiveLinkedList<object> awareLinkedList = (RecursiveLinkedList<object>)first.Value;
-                        if (currentPolicy.Allowance(awareLinkedList.ClusterData, listValue))
+                        RecursiveLinkedList<object> firstCluster = (RecursiveLinkedList<object>)first.Value;
+                        if (currentPolicy.Allowance(firstCluster.ClusterData, clusterValue))
                         {
-                            nextCluster = awareLinkedList;
+                            nextCluster = firstCluster;
                         }
                         else
                         {
                             nextCluster = RecursiveLinkedList<object>.CreateFirst<object>(currentCluster,
-                                currentPolicy.ClusterData(listValue));
+                                currentPolicy.ClusterData(clusterValue));
                         }
                     }
                 }
@@ -240,29 +239,29 @@ namespace CacheLib.Discard
                     if (last is null)
                     {
                         nextCluster = RecursiveLinkedList<object>.CreateLast<object>(currentCluster,
-                            currentPolicy.ClusterData(listValue));
+                            currentPolicy.ClusterData(clusterValue));
                     }
                     else
                     {
-                        RecursiveLinkedList<object> awareLinkedList = (RecursiveLinkedList<object>)last.Value;
-                        if (currentPolicy.Change(awareLinkedList.ClusterData, listValue) > 0)
+                        RecursiveLinkedList<object> lastCluster = (RecursiveLinkedList<object>)last.Value;
+                        if (currentPolicy.Change(lastCluster.ClusterData, clusterValue) > 0)
                         {
                             nextCluster = RecursiveLinkedList<object>.CreateLast<object>(currentCluster,
-                                currentPolicy.ClusterData(listValue));
+                                currentPolicy.ClusterData(clusterValue));
                         }
                         else
                         {
-                            nextCluster = awareLinkedList;
+                            nextCluster = lastCluster;
                         }
                     }
                 }
 
                 currentPolicy = _policies[i];
-                position = currentPolicy.Insertion(listValue);
+                position = currentPolicy.Insertion(clusterValue);
                 currentCluster = nextCluster;
             }
 
-            return position == 0 ? currentCluster.AddFirst(listValue) : currentCluster.AddLast(listValue);
+            return position == 0 ? currentCluster.AddFirst(clusterValue) : currentCluster.AddLast(clusterValue);
         }
     }
 }
