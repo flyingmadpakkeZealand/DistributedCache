@@ -9,29 +9,31 @@ namespace CacheTesting.DiscardStrategies
 {
     public class PremiumLfu : IDiscardPolicy<PremiumAccessData>
     {
+        public Dimension ThisDimension { get; } = (Dimension) 1;
+
         public int LookAhead { get; } = 2;
 
-        public int Insertion(PremiumAccessData listValue)
+        public ClusterPosition Insertion(PremiumAccessData value)
         {
             throw new NotImplementedException();
         }
 
-        public int Deletion()
+        public ClusterPosition Deletion()
         {
             throw new NotImplementedException();
         }
 
-        public object ClusterData(PremiumAccessData listValue)
+        public object ClusterData(PremiumAccessData value)
         {
             throw new NotImplementedException();
         }
 
-        public int Change(object clusterData, PremiumAccessData listValue)
+        public Dimension ChangeTo(object clusterData, PremiumAccessData value)
         {
             throw new NotImplementedException();
         }
 
-        public bool Allowance(object clusterData, PremiumAccessData listValue)
+        public bool Allowance(object clusterData, PremiumAccessData value)
         {
             throw new NotImplementedException();
         }

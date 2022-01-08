@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using CacheLib;
 using CacheLib.Discard;
+using CacheLib.Expiry;
 using DistributedSetupLib.Connection;
 using Newtonsoft.Json;
-using Sandbox.DiscardPolicyTest;
 
 namespace Sandbox
 {
@@ -31,20 +31,24 @@ namespace Sandbox
 
         static void Main(string[] args)
         {
-            RecursiveLinkedListWorker worker = new RecursiveLinkedListWorker();
-            var result1 = worker.Lru();
-            var result2 = worker.Lfu();
-            var result3 = worker.LfRu();
+            SimpleCache<string, int> cache = new SimpleCache<string, int>(100);
 
-            Func<string, Person> personCreator = str => new Person(str);
+            //RecursiveLinkedListWorker worker = new RecursiveLinkedListWorker();
+            //var result1 = worker.Lru();
+            //var result2 = worker.Lfu();
+            //var result3 = worker.LfRu();
 
-            DiscardGraph<MyClass> graph = new DiscardGraph<MyClass>();
-            graph.AddNew(new MyClass2());
+            //Func<string, Person> personCreator = str => new Person(str);
+
+            //DiscardGraph<MyClass> graph = new DiscardGraph<MyClass>();
+            //graph.AddNew(new MyClass2());
 
             //TestClass t = new TestClass();
             //t.Start4();
 
             //SimpleCache<int, int> cache = new SimpleCache<int, int>(1);
+
+            Dimension d = new Dimension();
 
             //bool result = cache.CompareAndSwap(42, default, 69);
 

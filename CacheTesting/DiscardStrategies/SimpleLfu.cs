@@ -9,48 +9,48 @@ namespace CacheTesting.DiscardStrategies
 {
     public class SimpleLfu : IDiscardPolicy<BasicAccessData>
     {
-        public int LookAhead { get; } = 1;
+        public virtual Dimension ThisDimension { get; } = (Dimension) 1;
+
+        public virtual int LookAhead { get; } = 1;
         
-        public int Insertion(BasicAccessData listValue)
+        public ClusterPosition Insertion(BasicAccessData value)
         {
-            return 0;
+            return ClusterPosition.First;
         }
 
-        public int Deletion()
+        public ClusterPosition Deletion()
         {
-            return 0;
+            return ClusterPosition.First;
         }
 
-        public object ClusterData(BasicAccessData listValue)
+        public object ClusterData(BasicAccessData value)
         {
-            return 10 * (listValue.FetchCount / 10);
+            int interval = 10 * (value.FetchCount / 10);
+            return interval < 50 ? interval : 50;
         }
 
-        public int Change(object clusterData, BasicAccessData listValue)
+        public virtual Dimension ChangeTo(object clusterData, BasicAccessData value)
         {
             int clusterCount = (int) clusterData;
 
-            if (listValue.FetchCount >= clusterCount + 10 && clusterCount < 50)
+            if (value.FetchCount >= clusterCount + 10 && clusterCount < 50)
             {
-                return 1;
+                return ThisDimension;
             }
 
-            return 0;
+            return Dimension.NoChange;
         }
 
-        public bool Allowance(object clusterData, BasicAccessData listValue)
+        public bool Allowance(object clusterData, BasicAccessData value)
         {
             int clusterCount = (int) clusterData;
 
-            return listValue.FetchCount >= clusterCount;
+            return value.FetchCount >= clusterCount;
         }
     }
 
     public class SimpleLfuBottomLru : SimpleLru
     {
-        public override int Change(object clusterData, BasicAccessData listValue)
-        {
-            return 2;
-        }
+        public override Dimension ThisDimension { get; } = (Dimension) 2;
     }
 }

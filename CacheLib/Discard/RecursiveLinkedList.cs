@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CacheLib.Discard
 {
-    internal class RecursiveLinkedList<TValue> : LinkedList<TValue>
+    internal class RecursiveLinkedList : LinkedList<object>
     {
         public LinkedListNode<object> ClusterNode { get; private set; }
 
@@ -17,33 +17,34 @@ namespace CacheLib.Discard
             ClusterData = clusterData;
         }
 
-        public static RecursiveLinkedList<T> CreateFirst<T>(LinkedList<object> list, object clusterData)
+        public static RecursiveLinkedList CreateFirst(LinkedList<object> list, object clusterData)
         {
-            RecursiveLinkedList<T> awareLinkedList = new RecursiveLinkedList<T>(clusterData);
-            awareLinkedList.ClusterNode = list.AddFirst(awareLinkedList);
+            RecursiveLinkedList recursiveLinkedList = new RecursiveLinkedList(clusterData);
+            recursiveLinkedList.ClusterNode = list.AddFirst(recursiveLinkedList);
 
-            return awareLinkedList;
+            return recursiveLinkedList;
         }
 
-        public static RecursiveLinkedList<T> CreateLast<T>(LinkedList<object> list, object clusterData)
+        public static RecursiveLinkedList CreateLast(LinkedList<object> list, object clusterData)
         {
-            RecursiveLinkedList<T> awareLinkedList = new RecursiveLinkedList<T>(clusterData);
-            awareLinkedList.ClusterNode = list.AddLast(awareLinkedList);
+            RecursiveLinkedList recursiveLinkedList = new RecursiveLinkedList(clusterData);
+            recursiveLinkedList.ClusterNode = list.AddLast(recursiveLinkedList);
 
-            return awareLinkedList;
+            return recursiveLinkedList;
         }
 
-        public static RecursiveLinkedList<T> CreateAfter<T>(LinkedList<object> list, object clusterData, LinkedListNode<object> afterThis)
+        public static RecursiveLinkedList CreateAfter(LinkedList<object> list, object clusterData,
+            LinkedListNode<object> afterThis)
         {
-            RecursiveLinkedList<T> awareLinkedList = new RecursiveLinkedList<T>(clusterData);
-            awareLinkedList.ClusterNode = list.AddAfter(afterThis, awareLinkedList);
+            RecursiveLinkedList recursiveLinkedList = new RecursiveLinkedList(clusterData);
+            recursiveLinkedList.ClusterNode = list.AddAfter(afterThis, recursiveLinkedList);
 
-            return awareLinkedList;
+            return recursiveLinkedList;
         }
 
-        public static RecursiveLinkedList<T> CreateInitial<T>()
+        public static RecursiveLinkedList CreateInitial()
         {
-            return new RecursiveLinkedList<T>(null);
+            return new RecursiveLinkedList(null);
         }
     }
 }

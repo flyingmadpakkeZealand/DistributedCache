@@ -8,15 +8,17 @@ namespace CacheLib.Discard
 {
     public interface IDiscardPolicy<in TValue>
     {
+        Dimension ThisDimension { get; }
+
         int LookAhead { get; }
 
-        int Insertion(TValue value);
+        ClusterPosition Insertion(TValue value);
 
-        int Deletion();
+        ClusterPosition Deletion();
 
         object ClusterData(TValue value);
 
-        int Change(object clusterData, TValue value);
+        Dimension ChangeTo(object clusterData, TValue value);
 
         bool Allowance(object clusterData, TValue value);
     }

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CacheLib;
 using CacheLib.Discard;
+using CacheTesting.DiscardStrategies;
 
 namespace CacheTesting.Scenarios
 {
@@ -37,6 +38,8 @@ namespace CacheTesting.Scenarios
 
             if (_iterationCounter == 0 && ++_phaseCounter % _initialPhases.Length == 0)
             {
+                SimpleLfRu.Day++;
+
                 for (int i = _initialPhases.Length; i > 0; i--)
                 {
                     Range previousPhase = _allPhases[^i];
@@ -62,6 +65,7 @@ namespace CacheTesting.Scenarios
             _allPhases.Clear();
             _iterationCounter = 0;
             _phaseCounter = 0;
+            SimpleLfRu.Day = 0;
 
             foreach (Range phase in _initialPhases)
             {

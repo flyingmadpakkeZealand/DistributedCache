@@ -106,16 +106,18 @@ namespace CacheLibTests
 
         private class SimpleOrderByFrequency : IDiscardPolicy<Data>
         {
+            public Dimension ThisDimension { get; } = (Dimension) 1;
+
             public int LookAhead { get; } = 5;
 
-            public int Insertion(Data listValue)
+            public ClusterPosition Insertion(Data listValue)
             {
-                return 0;
+                return ClusterPosition.First;
             }
 
-            public int Deletion()
+            public ClusterPosition Deletion()
             {
-                return 0;
+                return ClusterPosition.First;
             }
 
             public object ClusterData(Data listValue)
@@ -123,16 +125,16 @@ namespace CacheLibTests
                 return 10 * (listValue.HitCount / 10);
             }
 
-            public int Change(object clusterData, Data listValue)
+            public Dimension ChangeTo(object clusterData, Data listValue)
             {
                 int count = (int) clusterData;
 
                 if (listValue.HitCount >= count + 10 && listValue.HitCount < 60)
                 {
-                    return 1;
+                    return ThisDimension;
                 }
 
-                return 0;
+                return Dimension.NoChange;
             }
 
             public bool Allowance(object clusterData, Data listValue)
@@ -145,16 +147,18 @@ namespace CacheLibTests
 
         private class SimpleLru2 : IDiscardPolicy<Data>
         {
+            public Dimension ThisDimension { get; } = (Dimension) 2;
+
             public int LookAhead { get; } = 1;
 
-            public int Insertion(Data listValue)
+            public ClusterPosition Insertion(Data listValue)
             {
-                return 0;
+                return ClusterPosition.First;
             }
 
-            public int Deletion()
+            public ClusterPosition Deletion()
             {
-                return 1;
+                return ClusterPosition.Last;
             }
 
             public object ClusterData(Data listValue)
@@ -162,9 +166,9 @@ namespace CacheLibTests
                 return null;
             }
 
-            public int Change(object clusterData, Data listValue)
+            public Dimension ChangeTo(object clusterData, Data listValue)
             {
-                return 2;
+                return ThisDimension;
             }
 
             public bool Allowance(object clusterData, Data listValue)
@@ -175,16 +179,18 @@ namespace CacheLibTests
 
         private class SimpleLru : IDiscardPolicy<string>
         {
+            public Dimension ThisDimension { get; } = (Dimension) 1;
+
             public int LookAhead { get; } = 1;
 
-            public int Insertion(string listValue)
+            public ClusterPosition Insertion(string listValue)
             {
-                return 0;
+                return ClusterPosition.First;
             }
 
-            public int Deletion()
+            public ClusterPosition Deletion()
             {
-                return 1;
+                return ClusterPosition.Last;
             }
 
             public object ClusterData(string listValue)
@@ -192,9 +198,9 @@ namespace CacheLibTests
                 return null;
             }
 
-            public int Change(object clusterData, string listValue)
+            public Dimension ChangeTo(object clusterData, string listValue)
             {
-                return 1;
+                return ThisDimension;
             }
 
             public bool Allowance(object clusterData, string listValue)

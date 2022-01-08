@@ -13,6 +13,12 @@ namespace Sandbox
 
         private bool done;
 
+        public void Nothing<T>(T someType)
+        {
+            T newType = someType;
+            newType.ToString();
+        }
+
         public void Start()
         {
             new Task(AddToDictionary).Start();

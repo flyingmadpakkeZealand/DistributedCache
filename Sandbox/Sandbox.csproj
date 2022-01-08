@@ -6,6 +6,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="DiscardPolicyTest\**" />
+    <EmbeddedResource Remove="DiscardPolicyTest\**" />
+    <None Remove="DiscardPolicyTest\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="HitCountPolicy.cs" />
+    <Compile Remove="MockPolicy.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 

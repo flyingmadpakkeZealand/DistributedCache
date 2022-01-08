@@ -8,7 +8,7 @@ namespace CacheTesting
 {
     public class BasicAccessData : AbstractAdvancedCacheDataObject
     {
-        public int FetchCount { get; private set; }
+        public int FetchCount { get; set; }
 
         internal override void OnFetch()
         {
