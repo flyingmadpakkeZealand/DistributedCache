@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using CacheLib;
 using CacheLib.Discard;
 using CacheLib.Expiry;
@@ -32,6 +33,20 @@ namespace Sandbox
         static void Main(string[] args)
         {
             SimpleCache<string, int> cache = new SimpleCache<string, int>(100);
+
+            AdvancedCache<string, string, DefaultAdvancedCacheData<string, string>> advancedCache = new AdvancedCache<string, string, DefaultAdvancedCacheData<string, string>>(100, new SimpleLru());
+            advancedCache.Set("hi", "bye");
+            advancedCache.Fetch("hi", out string value);
+            advancedCache.CompareAndSwap("hi", "bye", "hello");
+            advancedCache.Fetch("hi", out value);
+            Console.WriteLine(value);
+
+            advancedCache.Set("hello", "string", out value, DateTimeOffset.UtcNow.AddSeconds(5));
+            advancedCache.Fetch("hello", out value);
+            Console.WriteLine(value);
+            Thread.Sleep(10_000);
+            advancedCache.Fetch("hello", out value);
+            Console.WriteLine(value);
 
             //RecursiveLinkedListWorker worker = new RecursiveLinkedListWorker();
             //var result1 = worker.Lru();
@@ -132,6 +147,38 @@ namespace Sandbox
             }
 
             Console.ReadLine();
+        }
+    }
+
+    public class SimpleLru : IDiscardPolicy<DefaultAdvancedCacheData<string, string>>
+    {
+        public virtual Dimension ThisDimension { get; } = (Dimension)1;
+
+        public int LookAhead { get; } = 1;
+
+        public ClusterPosition Insertion(DefaultAdvancedCacheData<string, string> value)
+        {
+            return ClusterPosition.First;
+        }
+
+        public ClusterPosition Deletion()
+        {
+            return ClusterPosition.Last;
+        }
+
+        public object ClusterData(DefaultAdvancedCacheData<string, string> value)
+        {
+            return null;
+        }
+
+        public virtual Dimension ChangeTo(object clusterData, DefaultAdvancedCacheData<string, string> value)
+        {
+            return ThisDimension;
+        }
+
+        public bool Allowance(object clusterData, DefaultAdvancedCacheData<string, string> value)
+        {
+            return true;
         }
     }
 }

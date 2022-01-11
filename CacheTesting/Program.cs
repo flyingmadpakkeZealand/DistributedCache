@@ -45,8 +45,8 @@ namespace CacheTesting
             hotRangeRequestsTest.Reset(CreateRandLfRu(100));
             scenarioRunner.Run(hotRangeRequestsTest, nameof(hotRangeRequestsTest) + "(LFRU)");
 
-            //hotRangeRequestsTest.Reset(CreateProbabilityLfu(100));
-            //scenarioRunner.Run(hotRangeRequestsTest, nameof(hotRangeRequestsTest) + "(ProbLFU)");
+            hotRangeRequestsTest.Reset(CreateProbabilityLfu(100));
+            scenarioRunner.Run(hotRangeRequestsTest, nameof(hotRangeRequestsTest) + "(ProbLFU)");
 
             hotRangeRequestsTest.Reset(new SimpleCache<int, int>(100));
             scenarioRunner.Run(hotRangeRequestsTest, nameof(hotRangeRequestsTest) + "(Control)");
@@ -68,8 +68,8 @@ namespace CacheTesting
             cyclicRequestsTest.Reset(CreateSimpleLfRu(100));
             scenarioRunner.Run(cyclicRequestsTest, nameof(cyclicRequestsTest) + "(LFRU)");
 
-            //cyclicRequestsTest.Reset(CreateProbabilityLfu(100));
-            //scenarioRunner.Run(cyclicRequestsTest, nameof(cyclicRequestsTest) + "(ProbLFU)");
+            cyclicRequestsTest.Reset(CreateProbabilityLfu(100));
+            scenarioRunner.Run(cyclicRequestsTest, nameof(cyclicRequestsTest) + "(ProbLFU)");
 
             cyclicRequestsTest.Reset(new SimpleCache<int, int>(100));
             scenarioRunner.Run(cyclicRequestsTest, nameof(cyclicRequestsTest) + "(Control)");
@@ -81,16 +81,16 @@ namespace CacheTesting
                     10,
                     new Range(0, 9));
 
-            //scenarioRunner.Run(phaseRequestsTest, nameof(phaseRequestsTest) + "(LRU)");
+            scenarioRunner.Run(phaseRequestsTest, nameof(phaseRequestsTest) + "(LRU)");
 
             phaseRequestsTest.Reset(CreateSimpleLfu(100));
             scenarioRunner.Run(phaseRequestsTest, nameof(phaseRequestsTest) + "(LFU)");
 
-            //phaseRequestsTest.Reset(CreateProbabilityLfu(100));
-            //scenarioRunner.Run(phaseRequestsTest, nameof(phaseRequestsTest) + "(ProbLFU)");
+            phaseRequestsTest.Reset(CreateProbabilityLfu(100));
+            scenarioRunner.Run(phaseRequestsTest, nameof(phaseRequestsTest) + "(ProbLFU)");
 
-            //phaseRequestsTest.Reset(CreateRandLfu(100));
-            //scenarioRunner.Run(phaseRequestsTest, nameof(phaseRequestsTest) + "(RandLFU)");
+            phaseRequestsTest.Reset(CreateRandLfu(100));
+            scenarioRunner.Run(phaseRequestsTest, nameof(phaseRequestsTest) + "(RandLFU)");
 
             phaseRequestsTest.Reset(CreateProbRandLfu(100));
             scenarioRunner.Run(phaseRequestsTest, nameof(phaseRequestsTest) + "(RandProbLFU)");
@@ -98,11 +98,11 @@ namespace CacheTesting
             phaseRequestsTest.Reset(CreateSimpleLfRu(100));
             scenarioRunner.Run(phaseRequestsTest, nameof(phaseRequestsTest) + "(LFRU)");
 
-            //phaseRequestsTest.Reset(CreateProbabilityLfRu(100));
-            //scenarioRunner.Run(phaseRequestsTest, nameof(phaseRequestsTest) + "(ProbLFRU)");
+            phaseRequestsTest.Reset(CreateProbabilityLfRu(100));
+            scenarioRunner.Run(phaseRequestsTest, nameof(phaseRequestsTest) + "(ProbLFRU)");
 
-            //phaseRequestsTest.Reset(CreateRandLfRu(100));
-            //scenarioRunner.Run(phaseRequestsTest, nameof(phaseRequestsTest) + "(RandLFRU");
+            phaseRequestsTest.Reset(CreateRandLfRu(100));
+            scenarioRunner.Run(phaseRequestsTest, nameof(phaseRequestsTest) + "(RandLFRU");
 
             phaseRequestsTest.Reset(CreateProbRandLfRu(100));
             scenarioRunner.Run(phaseRequestsTest, nameof(phaseRequestsTest) + "(RandProbLFRU)");

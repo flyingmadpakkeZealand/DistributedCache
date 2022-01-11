@@ -10,6 +10,7 @@ namespace CacheLib
     {
         public TKey Key { get; internal set; }
         public TValue Value { get; internal set; }
+        public DateTimeOffset? ExpireTime { get; internal set; }
 
         protected AbstractAdvancedCacheData()
         {
@@ -17,7 +18,5 @@ namespace CacheLib
 
         public abstract void OnFetch();
         public abstract void OnSet();
-        public abstract void OnDelete();
-        public abstract void OnCompareAndSwap();
     }
 }

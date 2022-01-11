@@ -34,7 +34,6 @@ namespace CacheTesting
                 nodeValue.OnFetch();
                 value = nodeValue.Value;
                 _discardGraph.UpdateNode(ref node);
-                _simpleCache.Set(key, node);
 
                 return true;
             }
