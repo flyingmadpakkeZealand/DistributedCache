@@ -51,6 +51,13 @@ namespace Sandbox
             Console.WriteLine(value);
             advancedCache.Fetch("hi", out value);
             Console.WriteLine(value);
+
+            AdvancedCache<string, string, DefaultAdvancedCacheData<string, string>> cache2 = new AdvancedCache<string, string, DefaultAdvancedCacheData<string, string>>(1, new SimpleLru());
+            cache2.Set("a", "b");
+            cache2.Set("r", "t");
+            cache2.Fetch("a", out value);
+            Console.WriteLine(value);
+
             //RecursiveLinkedListWorker worker = new RecursiveLinkedListWorker();
             //var result1 = worker.Lru();
             //var result2 = worker.Lfu();

@@ -42,6 +42,7 @@ namespace CacheLib
 
                 TGraph cacheData = (TGraph)cacheDataNode.Value;
                 cacheData.OnFetch();
+                _discardGraph.UpdateNode(ref cacheDataNode);
 
                 value = cacheData.Value;
                 return true;
@@ -73,21 +74,22 @@ namespace CacheLib
         {
             lock (_lock)
             {
-                bool keyExists = _dataStore.TryGetValue(key, out LinkedListNode<object> cacheDataNode);
-                oldValue = keyExists ? ((TGraph) cacheDataNode.Value).Value : default;
+                bool keyExists = _dataStore.TryGetValue(key, out LinkedListNode<object> oldCacheDataNode);
+                oldValue = keyExists ? ((TGraph) oldCacheDataNode.Value).Value : default;
 
                 TGraph newCacheData = new TGraph {Value = newValue, Key = key};
                 LinkedListNode<object> newCacheDataNode = _discardGraph.AddNew(newCacheData);
 
-                if (_dataStore.TryUpdate(key, newCacheDataNode, cacheDataNode)
+                if (_dataStore.TryUpdate(key, newCacheDataNode, oldCacheDataNode)
                     || !keyExists && _dataStore.TryAdd(key, newCacheDataNode))
                 {
                     if (keyExists)
                     {
-                        _discardGraph.QuickRemove(ref cacheDataNode);
+                        _discardGraph.QuickRemove(ref oldCacheDataNode);
                     }
 
                     newCacheData.OnSet();
+                    RemoveEntryIfFull();
                     return true;
                 }
 
@@ -166,9 +168,7 @@ namespace CacheLib
                     {
                         _discardGraph.QuickRemove(ref actual);
 
-                        TGraph newCacheData = new TGraph();
-                        newCacheData.Value = newValue;
-                        newCacheData.Key = key;
+                        TGraph newCacheData = new TGraph {Value = newValue, Key = key};
                         LinkedListNode<object> newCacheDataNode = _discardGraph.AddNew(newCacheData);
                         newCacheData.OnSet();
                         _dataStore[key] = newCacheDataNode;
@@ -192,12 +192,23 @@ namespace CacheLib
                         return false;
                     }
                     newCacheData.OnSet();
+                    RemoveEntryIfFull();
 
                     return true;
                 }
             }
 
             return false;
+        }
+
+        private void RemoveEntryIfFull()
+        {
+            if (_dataStore.Count > _maxSize)
+            {
+                LinkedListNode<object> entry = _discardGraph.RemoveEntries().First();
+                TGraph cacheData = (TGraph) entry.Value;
+                _dataStore.TryRemove(cacheData.Key, out LinkedListNode<object> _);
+            }
         }
 
         public void Dispose()
