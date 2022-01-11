@@ -125,10 +125,12 @@ namespace CacheLib
                     _discardGraph.QuickRemove(ref oldCacheDataNode);
                     TGraph oldCacheData = (TGraph) oldCacheDataNode.Value;
                     value = oldCacheData.Value;
+
+                    return true;
                 }
 
                 value = default;
-                return removed;
+                return false;
             }
         }
 

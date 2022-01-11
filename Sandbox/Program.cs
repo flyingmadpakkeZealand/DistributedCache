@@ -47,7 +47,10 @@ namespace Sandbox
             Thread.Sleep(10_000);
             advancedCache.Fetch("hello", out value);
             Console.WriteLine(value);
-
+            advancedCache.Delete("hi", out value);
+            Console.WriteLine(value);
+            advancedCache.Fetch("hi", out value);
+            Console.WriteLine(value);
             //RecursiveLinkedListWorker worker = new RecursiveLinkedListWorker();
             //var result1 = worker.Lru();
             //var result2 = worker.Lfu();
