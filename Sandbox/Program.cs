@@ -101,16 +101,16 @@ namespace Sandbox
             sw.AutoFlush = true;
             StreamReader sr = new StreamReader(client.GetStream());
 
-            Person p = new Person
+            Animal animal = new Animal
             {
-                Name = "Obama",
-                Age = 45,
-                Atoms = long.MaxValue,
-                Height = 1.89f,
-                Weight = 84.45f
+                Genus = "Crocodylus",
+                Species = "Johnstoni",
+                Gender = "Female",
+                Length = 1.6,
+                Weight = 35
             };
 
-            sw.WriteLine($"SET Person {JsonConvert.SerializeObject(p)}");
+            sw.WriteLine($"SET Animal {JsonConvert.SerializeObject(animal)}");
 
             while (true)
             {

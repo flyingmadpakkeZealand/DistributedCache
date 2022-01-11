@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,18 +16,29 @@ namespace CacheLib.Discard
 
         public DiscardGraph([NotNull] params IDiscardPolicy<TValue>[] policies)
         {
-            int dimensions = policies.Length;
-            if (dimensions < 1)
+            int dimensionsCount = policies.Length;
+            if (dimensionsCount < 1)
                 throw new ArgumentOutOfRangeException(nameof(policies));
 
-            _policies = new IDiscardPolicy<TValue>[dimensions];
+            _policies = new IDiscardPolicy<TValue>[dimensionsCount];
 
             foreach (IDiscardPolicy<TValue> policy in policies)
             {
-                _policies[policy.ThisDimension - 1] = policy;
+                int dimension = policy.ThisDimension;
+
+                if (dimension <= 0 || dimension > dimensionsCount) throw new ArgumentOutOfRangeException(nameof(policy.ThisDimension));
+
+                if (_policies[dimension - 1] is not null)
+                {
+                    IDiscardPolicy<TValue> policy2 = _policies[dimension - 1];
+
+                    throw new AmbiguousMatchException($"Two policies ('{policy2.GetType().FullName}' AND '{policy.GetType().FullName}') has equal dimension '{dimension}', each policy must have a different dimension.");
+                }
+
+                _policies[dimension - 1] = policy;
             }
 
-            _totalDimensions = dimensions;
+            _totalDimensions = dimensionsCount;
 
             _rootDimension = RecursiveLinkedList.CreateInitial();
         }

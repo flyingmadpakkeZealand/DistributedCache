@@ -47,7 +47,7 @@ namespace CacheLib.Expiry
         {
             long intervalKey = GetInterval(expiryTime);
             long syncInterval = GetInterval(DateTimeOffset.UtcNow);
-            if (intervalKey <= syncInterval)
+            if (intervalKey < syncInterval)
             {
                 _cache.Delete(cacheKey);
                 return false;
@@ -72,11 +72,11 @@ namespace CacheLib.Expiry
                 cacheKeys.Remove(cacheKey);
             }
 
-            if (newIntervalKey > syncInterval) return Add(newExpiryTime, cacheKey);
+            if (newIntervalKey >= syncInterval) return Add(newExpiryTime, cacheKey);
 
             _cache.Delete(cacheKey);
 
-            return true;
+            return false;
         }
 
         private Task RunExpiryMaintainerThread()

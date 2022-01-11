@@ -36,6 +36,7 @@ namespace CacheTesting.DiscardStrategies
 
             if (day < Day)
             {
+                value.FetchCount = value.FetchCount / 2;
                 return ThisDimension;
             }
 
@@ -53,17 +54,6 @@ namespace CacheTesting.DiscardStrategies
         public override Dimension ThisDimension { get; } = (Dimension) 2;
 
         public override int LookAhead { get; } = 2;
-
-        public override Dimension ChangeTo(object clusterData, BasicAccessData value)
-        {
-            Dimension newDimension = base.ChangeTo(clusterData, value);
-            if (newDimension != Dimension.NoChange)
-            {
-                value.FetchCount = value.FetchCount / 2;
-            }
-
-            return newDimension;
-        }
     }
 
     public class SimpleLfRuBottomLru : SimpleLru

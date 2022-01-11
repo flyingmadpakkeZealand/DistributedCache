@@ -1,26 +1,52 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CacheLib.Discard;
+using CacheLib.Expiry;
 
 namespace CacheLib
 {
-    public class SimpleCache<TKey, TValue> : ICache<TKey, TValue>
+    public class AdvancedCache<TKey, TValue, TGraph> : ICache<TKey, TValue>, IDisposable where TGraph : AbstractAdvancedCacheData<TKey, TValue>, new()
     {
-        private readonly ConcurrentDictionary<TKey, TValue> _dataStore;
+        private readonly ConcurrentDictionary<TKey, LinkedListNode<object>> _dataStore;
+        private readonly DiscardGraph<TGraph> _discardGraph;
+        private readonly ExpiryController<TKey, TValue> _expiryController;
         private readonly IEqualityComparer<TValue> _comparer;
         private readonly int _maxSize;
 
-        public SimpleCache(int maxSize)
+        private readonly object _simpleLock = new object();
+
+        public AdvancedCache(int maxSize, params IDiscardPolicy<TGraph>[] policies)
         {
+            _discardGraph = new DiscardGraph<TGraph>(policies);
+            _expiryController = ExpiryController<TKey, TValue>.CreateExpiryController(1_000, this);
             _maxSize = maxSize;
-            _dataStore = new ConcurrentDictionary<TKey, TValue>(8, 256);
+
+            _dataStore = new ConcurrentDictionary<TKey, LinkedListNode<object>>(8, 256);
         }
 
-        public bool Fetch(TKey key, out TValue value) => _dataStore.TryGetValue(key, out value);
+        public bool Fetch(TKey key, out TValue value)
+        {
+            bool keyExists = _dataStore.TryGetValue(key, out LinkedListNode<object> cacheDataNode);
+
+            if (!keyExists)
+            {
+                value = default;
+                return false;
+            }
+
+            lock (_simpleLock)
+            {
+                TGraph cacheData = (TGraph) cacheDataNode.Value;
+                cacheData.OnFetch();
+
+                value = cacheData.Value;
+                return true;
+            }
+        }
 
         public bool Set(TKey key, TValue value)
         {
@@ -58,13 +84,9 @@ namespace CacheLib
             return updateSucceeded;
         }
 
-        private void DiscardKeyIfFull()
+        public void Dispose()
         {
-            if (_dataStore.Count <= _maxSize) return;
-
-            ICollection<TKey> keyCollection = _dataStore.Keys;
-            TKey firstKey = keyCollection.First();
-            _dataStore.TryRemove(firstKey, out TValue _);
+            _expiryController.Dispose();
         }
     }
 }

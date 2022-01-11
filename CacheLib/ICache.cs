@@ -12,6 +12,8 @@ namespace CacheLib
 
         bool Set(TKey key, TValue value);
 
+        bool Set(TKey key, TValue newValue, out TValue oldValue);
+
         bool Delete(TKey key, out TValue value);
 
         bool Delete(TKey key);

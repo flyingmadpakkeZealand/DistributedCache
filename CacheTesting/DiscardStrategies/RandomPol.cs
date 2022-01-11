@@ -11,7 +11,7 @@ namespace CacheTesting.DiscardStrategies
     {
         private readonly Random _rand;
 
-        public Dimension ThisDimension { get; } = (Dimension) 3;
+        public virtual Dimension ThisDimension { get; } = (Dimension) 3;
 
         public int LookAhead { get; } = 1;
 

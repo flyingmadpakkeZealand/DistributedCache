@@ -61,6 +61,11 @@ namespace CacheTesting
             return _simpleCache.Set(key, node);
         }
 
+        public bool Set(int key, int newValue, out int oldValue)
+        {
+            throw new NotImplementedException();
+        }
+
         public bool Delete(int key, out int value)
         {
             throw new NotImplementedException();

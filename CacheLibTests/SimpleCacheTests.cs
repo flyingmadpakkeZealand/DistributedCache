@@ -33,13 +33,26 @@ namespace CacheLibTests
         [TestMethod]
         public void Set_WritesNewEntry()
         {
-            int value = 420, key = 69;
+            int value = 420, key = 42;
 
             bool setTrue = cache.Set(key, value);
             cache.Fetch(key, out int fetchValue);
 
             Assert.IsTrue(setTrue);
             Assert.AreEqual(value, fetchValue);
+        }
+
+        [TestMethod]
+        public void Set_WritesNewEntry_AndReturnsOldValue()
+        {
+            int newValue = 42;
+
+            bool valueChanged = cache.Set(KEY, newValue, out int oldValue);
+            cache.Fetch(KEY, out int fetchValue);
+
+            Assert.IsTrue(valueChanged);
+            Assert.AreEqual(newValue, fetchValue);
+            Assert.AreEqual(VALUE, oldValue);
         }
 
         [TestMethod]

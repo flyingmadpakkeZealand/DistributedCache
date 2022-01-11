@@ -10,8 +10,9 @@ namespace CacheTesting.DiscardStrategies
     public class ProbabilityLfu : IDiscardPolicy<BasicAccessData>
     {
         private readonly Random _rand;
+        private readonly double _probability;
 
-        public virtual double Probability { get; }
+        public virtual double ProbabilityThreshold { get; } = 0.75;
 
         public virtual Dimension ThisDimension { get; } = (Dimension) 1;
 
@@ -19,7 +20,7 @@ namespace CacheTesting.DiscardStrategies
 
         public ProbabilityLfu()
         {
-            Probability = Math.Pow(0.75, 0.1);
+            _probability = Math.Pow(ProbabilityThreshold, 0.1);
             _rand = new Random(42);
         }
 
@@ -40,7 +41,7 @@ namespace CacheTesting.DiscardStrategies
 
         public Dimension ChangeTo(object clusterData, BasicAccessData value)
         {
-            if (Probability <= _rand.NextDouble())
+            if (_probability <= _rand.NextDouble())
             {
                 return ThisDimension;
             }
@@ -55,6 +56,11 @@ namespace CacheTesting.DiscardStrategies
     }
 
     public class ProbabilityLfuBottomLru : SimpleLru
+    {
+        public override Dimension ThisDimension { get; } = (Dimension) 2;
+    }
+
+    public class ProbabilityLfuBottomRand : RandomPol
     {
         public override Dimension ThisDimension { get; } = (Dimension) 2;
     }

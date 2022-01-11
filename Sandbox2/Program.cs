@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -9,15 +10,38 @@ namespace Sandbox2
     {
         static void Main(string[] args)
         {
-            IPEndPoint endPoint = new IPEndPoint(IPAddress.Loopback, 7);
-            TcpClient client = new TcpClient();
+            ConcurrentDictionary<string, string> concurrentDictionary = 
+                new ConcurrentDictionary<string, string>();
 
-            client.Connect(endPoint);
-            StreamWriter sw = new StreamWriter(client.GetStream());
-            sw.Write("Hi\nWhat is your name?\nI like you\0");
-            sw.Flush();
+            while (true)
+            {
+                string oldValue = concurrentDictionary["Animal"];
 
-            Console.ReadLine();
+                if (oldValue is null)
+                {
+                    if (concurrentDictionary.TryAdd("Animal", "Croc"))
+                    {
+                        //return null;
+                    }
+
+                    continue;
+                }
+            
+                if (concurrentDictionary.TryUpdate("Animal", "croc", oldValue))
+                {
+                    //return oldValue;
+                }
+            }
+
+            //IPEndPoint endPoint = new IPEndPoint(IPAddress.Loopback, 7);
+            //TcpClient client = new TcpClient();
+
+            //client.Connect(endPoint);
+            //StreamWriter sw = new StreamWriter(client.GetStream());
+            //sw.Write("Hi\nWhat is your name?\nI like you\0");
+            //sw.Flush();
+
+            //Console.ReadLine();
         }
     }
 }
